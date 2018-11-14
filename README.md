@@ -1,1 +1,1 @@
-#GDBMS
+GPU-Accelerated Voltdb
