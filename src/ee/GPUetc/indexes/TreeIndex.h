@@ -5,8 +5,8 @@
 #include <cuda_runtime.h>
 #include "KeyIndex.h"
 #include "Index.h"
-#include "GPUetc/storage/gtuple.h"
-#include "GPUetc/common/common.h"
+#include "gtuple.h"
+#include "common.h"
 
 namespace gpu {
 

@@ -1,6 +1,6 @@
 #include "utilities.h"
-#include "GPUetc/storage/gnvalue.h"
-#include "GPUetc/storage/gtable.h"
+#include "gnvalue.h"
+#include "gtable.h"
 
 #include <stdio.h>
 #include <stdlib.h>

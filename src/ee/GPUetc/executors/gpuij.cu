@@ -10,7 +10,6 @@
 #include <cuda_runtime.h>
 #include <cuda_profiler_api.h>
 #include <cudaProfiler.h>
-#include "gpuij.h"
 #include <sys/time.h>
 #include <thrust/device_ptr.h>
 #include <thrust/device_vector.h>
@@ -19,6 +18,9 @@
 #include <thrust/fill.h>
 #include <inttypes.h>
 #include <thrust/system/cuda/execution_policy.h>
+
+#include "gtuple.h"
+#include "gpuij.h"
 #include "utilities.h"
 
 namespace gpu {
@@ -348,14 +350,14 @@ void GPUIJ::PrejoinFilter(bool *result)
 	int outer_rows = outer_table_.getCurrentRowNum();
 	int block_x, grid_x;
 
-	block_x = (outer_rows < BLOCK_SIZE_X) ? outer_rows : BLOCK_SIZE_X;
+	block_x = (outer_rows < BLOCK_SIZE_X_) ? outer_rows : BLOCK_SIZE_X_;
 	grid_x = (outer_rows - 1)/block_x + 1;
 
 	int64_t *val_stack;
 	ValueType *type_stack;
 
-	checkCudaErrors(cudaMalloc(&val_stack, sizeof(int64_t) * block_x * grid_x * MAX_STACK_SIZE));
-	checkCudaErrors(cudaMalloc(&type_stack, sizeof(ValueType) * block_x * grid_x * MAX_STACK_SIZE));
+	checkCudaErrors(cudaMalloc(&val_stack, sizeof(int64_t) * block_x * grid_x * MAX_STACK_SIZE_));
+	checkCudaErrors(cudaMalloc(&type_stack, sizeof(ValueType) * block_x * grid_x * MAX_STACK_SIZE_));
 
 	dim3 grid_size(grid_x, 1, 1);
 	dim3 block_size(block_x, 1, 1);
@@ -373,14 +375,14 @@ void GPUIJ::PrejoinFilter(bool *result, cudaStream_t stream)
 	int outer_rows = outer_table_.getCurrentRowNum();
 	int block_x, grid_x;
 
-	block_x = (outer_rows < BLOCK_SIZE_X) ? outer_rows : BLOCK_SIZE_X;
+	block_x = (outer_rows < BLOCK_SIZE_X_) ? outer_rows : BLOCK_SIZE_X_;
 	grid_x = (outer_rows - 1)/block_x + 1;
 
 	int64_t *val_stack;
 	ValueType *type_stack;
 
-	checkCudaErrors(cudaMalloc(&val_stack, sizeof(int64_t) * block_x * grid_x * MAX_STACK_SIZE));
-	checkCudaErrors(cudaMalloc(&type_stack, sizeof(ValueType) * block_x * grid_x * MAX_STACK_SIZE));
+	checkCudaErrors(cudaMalloc(&val_stack, sizeof(int64_t) * block_x * grid_x * MAX_STACK_SIZE_));
+	checkCudaErrors(cudaMalloc(&type_stack, sizeof(ValueType) * block_x * grid_x * MAX_STACK_SIZE_));
 
 	dim3 grid_size(grid_x, 1, 1);
 	dim3 block_size(block_x, 1, 1);
@@ -406,7 +408,7 @@ void GPUIJ::Decompose(ResBound *in, RESULT *out, ulong *in_location, ulong *loca
 {
 	int block_x, grid_x;
 
-	block_x = (size < BLOCK_SIZE_X) ? size : BLOCK_SIZE_X;
+	block_x = (size < BLOCK_SIZE_X_) ? size : BLOCK_SIZE_X_;
 	grid_x = (size - 1)/block_x + 1;
 
 	dim3 grid_size(grid_x, 1, 1);
@@ -421,7 +423,7 @@ void GPUIJ::Decompose(ResBound *in, RESULT *out, ulong *in_location, ulong *loca
 {
 	int block_x, grid_x;
 
-	block_x = (size < BLOCK_SIZE_X) ? size : BLOCK_SIZE_X;
+	block_x = (size < BLOCK_SIZE_X_) ? size : BLOCK_SIZE_X_;
 	grid_x = (size - 1)/block_x + 1;
 
 	dim3 grid_size(grid_x, 1, 1);
@@ -550,14 +552,14 @@ void GPUIJ::IndexFilter(ulong *index_psum, ResBound *res_bound, bool *prejoin_re
 	int outer_rows = outer_table_.getCurrentRowNum(), inner_rows = inner_table_.getCurrentRowNum();
 	int block_x, grid_x;
 
-	block_x = (outer_rows < BLOCK_SIZE_X) ? outer_rows : BLOCK_SIZE_X;
+	block_x = (outer_rows < BLOCK_SIZE_X_) ? outer_rows : BLOCK_SIZE_X_;
 	grid_x = (outer_rows - 1)/block_x + 1;
 
 	int64_t *val_stack;
 	ValueType *type_stack;
 
-	checkCudaErrors(cudaMalloc(&val_stack, sizeof(int64_t) * block_x * grid_x * MAX_STACK_SIZE));
-	checkCudaErrors(cudaMalloc(&type_stack, sizeof(ValueType) * block_x * grid_x * MAX_STACK_SIZE));
+	checkCudaErrors(cudaMalloc(&val_stack, sizeof(int64_t) * block_x * grid_x * MAX_STACK_SIZE_));
+	checkCudaErrors(cudaMalloc(&type_stack, sizeof(ValueType) * block_x * grid_x * MAX_STACK_SIZE_));
 
 	dim3 grid_size(grid_x, 1, 1);
 	dim3 block_size(block_x, 1, 1);
@@ -584,14 +586,14 @@ void GPUIJ::IndexFilter(ulong *index_psum, ResBound *res_bound, bool *prejoin_re
 	int outer_rows = outer_table_.getCurrentRowNum(), inner_rows = inner_table_.getCurrentRowNum();
 	int block_x, grid_x;
 
-	block_x = (outer_rows < BLOCK_SIZE_X) ? outer_rows : BLOCK_SIZE_X;
+	block_x = (outer_rows < BLOCK_SIZE_X_) ? outer_rows : BLOCK_SIZE_X_;
 	grid_x = (outer_rows - 1) / block_x + 1;
 
 	int64_t *val_stack;
 	ValueType *type_stack;
 
-	checkCudaErrors(cudaMalloc(&val_stack, sizeof(int64_t) * block_x * grid_x * MAX_STACK_SIZE));
-	checkCudaErrors(cudaMalloc(&type_stack, sizeof(ValueType) * block_x * grid_x * MAX_STACK_SIZE));
+	checkCudaErrors(cudaMalloc(&val_stack, sizeof(int64_t) * block_x * grid_x * MAX_STACK_SIZE_));
+	checkCudaErrors(cudaMalloc(&type_stack, sizeof(ValueType) * block_x * grid_x * MAX_STACK_SIZE_));
 
 	dim3 grid_size(grid_x, 1, 1);
 	dim3 block_size(block_x, 1, 1);
@@ -679,14 +681,14 @@ void GPUIJ::ExpressionFilter(RESULT *in_bound, RESULT *out_bound, ulong *mark_lo
 
 	int block_x, grid_x;
 
-	block_x = (size < BLOCK_SIZE_X) ? size : BLOCK_SIZE_X;
+	block_x = (size < BLOCK_SIZE_X_) ? size : BLOCK_SIZE_X_;
 	grid_x = (size <= partition_size) ? (size - 1)/block_x + 1 : (partition_size - 1)/block_x + 1;
 
 	int64_t *val_stack;
 	ValueType *type_stack;
 
-	checkCudaErrors(cudaMalloc(&val_stack, sizeof(int64_t) * block_x * grid_x * MAX_STACK_SIZE));
-	checkCudaErrors(cudaMalloc(&type_stack, sizeof(ValueType) * block_x * grid_x * MAX_STACK_SIZE));
+	checkCudaErrors(cudaMalloc(&val_stack, sizeof(int64_t) * block_x * grid_x * MAX_STACK_SIZE_));
+	checkCudaErrors(cudaMalloc(&type_stack, sizeof(ValueType) * block_x * grid_x * MAX_STACK_SIZE_));
 
 	dim3 grid_size(grid_x, 1, 1);
 	dim3 block_size(block_x, 1, 1);
@@ -730,9 +732,9 @@ extern "C" __global__ void ExpressionFilterDev(GTable outer, GTable inner,
 			outer_tuple = outer.getGTuple(res_left);
 			inner_tuple = inner.getGTuple(res_right);
 
-			res = (end_dev.getSize() > 0) ? end_dev.evaluate(&outer_tuple, &inner_tuple, val_stack + index, type_stack + index, offset) : res;
-			res = (post_dev.getSize() > 0 && res.isTrue()) ? end_dev.evaluate(&outer_tuple, &inner_tuple, val_stack + index, type_stack + index, offset) : res;
-			res = (where_dev.getSize() > 0 && res.isTrue()) ? where_dev.evaluate(&outer_tuple, &inner_tuple, val_stack + index, type_stack + index, offset) : res;
+			res = (end_dev.getSize() > 0) ? end_dev.evaluate(outer_tuple, inner_tuple, val_stack + index, type_stack + index, offset) : res;
+			res = (post_dev.getSize() > 0 && res.isTrue()) ? end_dev.evaluate(outer_tuple, inner_tuple, val_stack + index, type_stack + index, offset) : res;
+			res = (where_dev.getSize() > 0 && res.isTrue()) ? where_dev.evaluate(outer_tuple, inner_tuple, val_stack + index, type_stack + index, offset) : res;
 
 			result[writeloc].lkey = (res.isTrue()) ? i : (-1);
 			result[writeloc].rkey = (res.isTrue()) ? res_left : (-1);
@@ -754,14 +756,14 @@ void GPUIJ::ExpressionFilter(ulong *index_psum, ulong *exp_psum, RESULT *result,
 	int partition_size = DEFAULT_PART_SIZE_;
 	int block_x, grid_x;
 
-	block_x = (outer_rows < BLOCK_SIZE_X) ? outer_rows : BLOCK_SIZE_X;
+	block_x = (outer_rows < BLOCK_SIZE_X_) ? outer_rows : BLOCK_SIZE_X_;
 	grid_x = (outer_rows < partition_size) ? (outer_rows - 1)/block_x + 1 : (partition_size - 1)/block_x + 1;
 
 	int64_t *val_stack;
 	ValueType *type_stack;
 
-	checkCudaErrors(cudaMalloc(&val_stack, sizeof(int64_t) * block_x * grid_x * MAX_STACK_SIZE));
-	checkCudaErrors(cudaMalloc(&type_stack, sizeof(ValueType) * block_x * grid_x * MAX_STACK_SIZE));
+	checkCudaErrors(cudaMalloc(&val_stack, sizeof(int64_t) * block_x * grid_x * MAX_STACK_SIZE_));
+	checkCudaErrors(cudaMalloc(&type_stack, sizeof(ValueType) * block_x * grid_x * MAX_STACK_SIZE_));
 
 	dim3 grid_size(grid_x, 1, 1);
 	dim3 block_size(block_x, 1, 1);
@@ -790,15 +792,15 @@ void GPUIJ::ExpressionFilter(ulong *index_psum, ulong *exp_psum, RESULT *result,
 	int partition_size = DEFAULT_PART_SIZE_;
 	int block_x, grid_x;
 
-	block_x = (outer_rows < BLOCK_SIZE_X) ? outer_rows : BLOCK_SIZE_X;
+	block_x = (outer_rows < BLOCK_SIZE_X_) ? outer_rows : BLOCK_SIZE_X_;
 	grid_x = (outer_rows < partition_size) ? (outer_rows - 1)/block_x + 1 : (partition_size - 1)/block_x + 1;
 
 
 	int64_t *val_stack;
 	ValueType *type_stack;
 
-	checkCudaErrors(cudaMalloc(&val_stack, sizeof(int64_t) * block_x * grid_x * MAX_STACK_SIZE));
-	checkCudaErrors(cudaMalloc(&type_stack, sizeof(ValueType) * block_x * grid_x * MAX_STACK_SIZE));
+	checkCudaErrors(cudaMalloc(&val_stack, sizeof(int64_t) * block_x * grid_x * MAX_STACK_SIZE_));
+	checkCudaErrors(cudaMalloc(&type_stack, sizeof(ValueType) * block_x * grid_x * MAX_STACK_SIZE_));
 
 	dim3 grid_size(grid_x, 1, 1);
 	dim3 block_size(block_x, 1, 1);

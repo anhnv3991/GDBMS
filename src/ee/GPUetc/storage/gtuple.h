@@ -3,13 +3,13 @@
 
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include "GPUetc/common/common.h"
+#include "common.h"
 #include "gnvalue.h"
 #include <string>
 
 namespace gpu {
 
-class Tuple {
+class GTuple {
 	friend class GKeyIndex;
 	friend class GTreeIndexKey;
 	friend class GHashIndexKey;
@@ -17,8 +17,8 @@ class Tuple {
 	friend class GExpression;
 	friend class GTable;
 public:
-	CUDAH Tuple();
-	CUDAH Tuple(int64_t *tuple, GColumnInfo *schema_buff, int max_columns, int offset, char *secondary_storage = NULL);
+	CUDAH GTuple();
+	CUDAH GTuple(int64_t *tuple, GColumnInfo *schema_buff, int max_columns, int offset, char *secondary_storage = NULL);
 
 	CUDAH int getColumnCount();
 	CUDAH GNValue getGNValue(int column_idx);
@@ -37,7 +37,7 @@ protected:
 	int offset_;
 };
 
-CUDAH Tuple::Tuple()
+CUDAH GTuple::GTuple()
 {
 	tuple_ = NULL;
 	secondary_storage_ = NULL;
@@ -47,7 +47,7 @@ CUDAH Tuple::Tuple()
 }
 
 
-CUDAH Tuple::Tuple(int64_t *tuple, GColumnInfo *schema_buff, int max_columns, int offset, char *secondary_storage)
+CUDAH GTuple::GTuple(int64_t *tuple, GColumnInfo *schema_buff, int max_columns, int offset, char *secondary_storage)
 {
 	tuple_ = tuple;
 	secondary_storage_ = secondary_storage;
@@ -56,12 +56,12 @@ CUDAH Tuple::Tuple(int64_t *tuple, GColumnInfo *schema_buff, int max_columns, in
 	offset_ = offset;
 }
 
-CUDAH int Tuple::getColumnCount()
+CUDAH int GTuple::getColumnCount()
 {
 	return columns_;
 }
 
-CUDAH bool Tuple::setGNValue(GNValue value, int column_idx)
+CUDAH bool GTuple::setGNValue(GNValue value, int column_idx)
 {
 	if (column_idx >= columns_)
 		return false;
@@ -71,7 +71,7 @@ CUDAH bool Tuple::setGNValue(GNValue value, int column_idx)
 	return true;
 }
 
-CUDAH GNValue Tuple::getGNValue(int column_idx)
+CUDAH GNValue GTuple::getGNValue(int column_idx)
 {
 	if (column_idx < columns_)
 		return GNValue(schema_[column_idx].data_type, tuple_[column_idx * offset_], secondary_storage_);
@@ -79,7 +79,7 @@ CUDAH GNValue Tuple::getGNValue(int column_idx)
 	return GNValue::getInvalid();
 }
 
-CUDAH GNValue Tuple::at(int column_idx)
+CUDAH GNValue GTuple::at(int column_idx)
 {
 	if (column_idx < columns_)
 		return GNValue(schema_[column_idx].data_type, tuple_[column_idx * offset_], secondary_storage_);
@@ -87,7 +87,7 @@ CUDAH GNValue Tuple::at(int column_idx)
 	return GNValue::getInvalid();
 }
 
-CUDAH GNValue Tuple::operator[](int column_idx)
+CUDAH GNValue GTuple::operator[](int column_idx)
 {
 	if (column_idx < columns_)
 		return GNValue(schema_[column_idx].data_type, tuple_[column_idx * offset_], secondary_storage_);

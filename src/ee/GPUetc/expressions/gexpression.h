@@ -3,9 +3,9 @@
 
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include "GPUetc/common/common.h"
-#include "GPUetc/storage/gnvalue.h"
-#include "GPUetc/storage/gtuple.h"
+#include "common.h"
+#include "gnvalue.h"
+#include "gtuple.h"
 #include <vector>
 
 namespace gpu {

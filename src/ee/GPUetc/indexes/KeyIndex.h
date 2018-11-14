@@ -3,7 +3,7 @@
 
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include "GPUetc/common/common.h"
+#include "common.h"
 
 namespace gpu {
 class GKeyIndex {

@@ -1,12 +1,12 @@
 #ifndef GPUHJ_H_
 #define GPUHJ_H_
 
-#include "GPUetc/common/types.h"
+#include "types.h"
 #include <cuda.h>
 #include <sys/time.h>
 #include <vector>
-#include "GPUetc/storage/gtable.h"
-#include "GPUetc/expressions/gexpression.h"
+#include "gtable.h"
+#include "gexpression.h"
 
 
 namespace gpu {

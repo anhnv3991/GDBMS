@@ -4,11 +4,11 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include "gnvalue.h"
-#include "GPUetc/common/common.h"
-#include "GPUetc/common/macros.h"
-#include "GPUetc/indexes/TreeIndex.h"
-#include "GPUetc/indexes/HashIndex.h"
-#include "GPUetc/indexes/KeyIndex.h"
+#include "common.h"
+#include "macros.h"
+#include "TreeIndex.h"
+#include "HashIndex.h"
+#include "KeyIndex.h"
 #include "gblock.h"
 
 namespace gpu {

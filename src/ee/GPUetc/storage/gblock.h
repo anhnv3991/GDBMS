@@ -4,7 +4,7 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <vector>
-#include "GPUetc/common/common.h"
+#include "common.h"
 #include "gtuple.h"
 
 namespace gpu {

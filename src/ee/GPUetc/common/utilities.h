@@ -12,7 +12,7 @@
 
 namespace gpu {
 
-class Utilities {
+class GUtilities {
 public:
 	static void RemoveEmptyResult(RESULT *out_bound, RESULT *in_bound, ulong *in_location, ulong *out_location, uint in_size);
 	static void RemoveEmptyResult(RESULT *out_bound, RESULT *in_bound, ulong *in_location, ulong *out_location, uint in_size, cudaStream_t stream);

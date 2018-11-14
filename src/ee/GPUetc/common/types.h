@@ -1,3 +1,6 @@
+#ifndef GPU_TYPES_H_
+#define GPU_TYPES_H_
+
 #include <cuda.h>
 
 namespace gpu {
@@ -70,3 +73,5 @@ enum IndexLookupType {
    INDEX_LOOKUP_TYPE_GEO_CONTAINS = 6,
 };
 }
+
+#endif

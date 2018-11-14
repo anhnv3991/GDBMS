@@ -2,10 +2,10 @@
 #define GPUIJ_H
 
 #include <cuda.h>
-#include "GPUetc/common/common.h"
-#include "GPUetc/common/types.h"
-#include "GPUetc/storage/gtable.h"
-#include "GPUetc/expressions/gexpression.h"
+#include "common.h"
+#include "types.h"
+#include "gtable.h"
+#include "gexpression.h"
 
 namespace gpu {
 

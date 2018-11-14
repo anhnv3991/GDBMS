@@ -1,6 +1,6 @@
 #include "gpuhj.h"
-#include "GPUetc/common/types.h"
-#include "GPUetc/storage/gtable.h"
+#include "types.h"
+#include "gtable.h"
 
 #include <stdio.h>
 #include <stdlib.h>

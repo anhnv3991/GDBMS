@@ -3,10 +3,10 @@
 
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include "GPUetc/common/GPUTUPLE.h"
-#include "GPUetc/common/GNValue.h"
-#include "GPUetc/storage/gtable.h"
-#include "GPUetc/expressions/gexpression.h"
+#include "gtuple.h"
+#include "gnvalue.h"
+#include "gtable.h"
+#include "gexpression.h"
 #include <vector>
 #include <string>
 

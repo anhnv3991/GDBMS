@@ -1,8 +1,6 @@
 #include "seqscan.h"
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include <helper_cuda.h>
-#include <helper_functions.h>
 #include <string>
 #include <sstream>
 #include "utilities.h"

@@ -1,7 +1,7 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include "GPUetc/indexes/KeyIndex.h"
-#include "GPUetc/indexes/TreeIndex.h"
+#include "KeyIndex.h"
+#include "TreeIndex.h"
 
 namespace gpu {
 

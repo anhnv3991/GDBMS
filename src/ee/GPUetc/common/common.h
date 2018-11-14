@@ -1,7 +1,7 @@
 #ifndef NODEDATA_H
 #define NODEDATA_H
 
-#include "common/types.h"
+#include "types.h"
 #include <cuda.h>
 
 namespace gpu {

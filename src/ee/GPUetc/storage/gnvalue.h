@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include "GPUetc/common/types.h"
+#include "types.h"
 #include <iostream>
 #include <string>
 #include <sstream>
-#include "GPUetc/common/common.h"
+#include "common.h"
 
 namespace gpu {
 
@@ -253,7 +253,7 @@ CUDAD GNValue GNValue::operator==(const GNValue rhs) const
 			int lsize = static_cast<int>(m_data_ & STRING_MASK);
 			int rsize = static_cast<int>(rhs.m_data_ & STRING_MASK);
 			char *left = secondary_storage_ + m_data_ >> 16;
-			char *right = rhs.secondary_storage + rhs.m_data_ >> 16;
+			char *right = rhs.secondary_storage_ + rhs.m_data_ >> 16;
 
 			while (i < lsize && i < rsize && result) {
 				result = (left[i] == right[i]);
@@ -289,7 +289,7 @@ CUDAD GNValue GNValue::operator!=(const GNValue rhs) const
 			int lsize = static_cast<int>(m_data_ & STRING_MASK);
 			int rsize = static_cast<int>(rhs.m_data_ & STRING_MASK);
 			char *left = secondary_storage_ + m_data_ >> 16;
-			char *right = rhs.secondary_storage + rhs.m_data_ >> 16;
+			char *right = rhs.secondary_storage_ + rhs.m_data_ >> 16;
 
 			while (i < lsize && i < rsize && result) {
 				result = (left[i] == right[i]);
@@ -326,7 +326,7 @@ CUDAD GNValue GNValue::operator<(const GNValue rhs) const
 			int lsize = static_cast<int>(m_data_ & STRING_MASK);
 			int rsize = static_cast<int>(rhs.m_data_ & STRING_MASK);
 			char *left = secondary_storage_ + m_data_ >> 16;
-			char *right = rhs.secondary_storage + rhs.m_data_ >> 16;
+			char *right = rhs.secondary_storage_ + rhs.m_data_ >> 16;
 
 			while (i < lsize && i < rsize && result) {
 				result = (left[i] < right[i]);
@@ -363,7 +363,7 @@ CUDAD GNValue GNValue::operator<=(const GNValue rhs) const
 			int lsize = static_cast<int>(m_data_ & STRING_MASK);
 			int rsize = static_cast<int>(rhs.m_data_ & STRING_MASK);
 			char *left = secondary_storage_ + m_data_ >> 16;
-			char *right = rhs.secondary_storage + rhs.m_data_ >> 16;
+			char *right = rhs.secondary_storage_ + rhs.m_data_ >> 16;
 
 			while (i < lsize && i < rsize && result) {
 				result = (left[i] <= right[i]);
@@ -400,7 +400,7 @@ CUDAD GNValue GNValue::operator>(const GNValue rhs) const
 			int lsize = static_cast<int>(m_data_ & STRING_MASK);
 			int rsize = static_cast<int>(rhs.m_data_ & STRING_MASK);
 			char *left = secondary_storage_ + m_data_ >> 16;
-			char *right = rhs.secondary_storage + rhs.m_data_ >> 16;
+			char *right = rhs.secondary_storage_ + rhs.m_data_ >> 16;
 
 			while (i < lsize && i < rsize && result) {
 				result = (left[i] > right[i]);
@@ -437,7 +437,7 @@ CUDAD GNValue GNValue::operator>=(const GNValue rhs) const
 			int lsize = static_cast<int>(m_data_ & STRING_MASK);
 			int rsize = static_cast<int>(rhs.m_data_ & STRING_MASK);
 			char *left = secondary_storage_ + m_data_ >> 16;
-			char *right = rhs.secondary_storage + rhs.m_data_ >> 16;
+			char *right = rhs.secondary_storage_ + rhs.m_data_ >> 16;
 
 			while (i < lsize && i < rsize && result) {
 				result = (left[i] >= right[i]);

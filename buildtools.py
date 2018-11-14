@@ -1,6 +1,7 @@
 import os, sys, threading, shutil, re
 import xml.etree.ElementTree as ET
 from subprocess import Popen, PIPE, STDOUT
+import subprocess # Added for GPU
 
 
 class BuildContext:
@@ -474,6 +475,31 @@ def buildMakefile(CTX):
         input = CTX.THIRD_PARTY_INPUT[dir].split()
         third_party_input_paths += [THIRD_PARTY_INPUT_PREFIX + "/" + dir + "/" + x for x in input]
 
+    # Added for GPU
+    # Get compute capability
+    subprocess.call(['make', '--directory=third_party/gpu/'])
+    p = subprocess.Popen("third_party/gpu/check_cc", shell=True, stdin=subprocess.PIPE,
+                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                          close_fds=True)
+    ComCap = p.stdout.readline()
+    if "A GPU which is capable of using CUDA is not detected..." in ComCap:
+         return False
+         
+    NVCC = "nvcc --std c++11"
+    GPUFLAGS = " -L/usr/local/cuda/lib64 -lcuda -lstdc++ -lcudart -I/usr/local/cuda/include -I/usr/cuda/samples/common/inc -I../../src/ee/GPUetc/common/"
+    GPUFLAGS += " -I../../src/ee/GPUetc/executors/ -I../../src/ee/GPUetc/expressions/ -I../../src/ee/GPUetc/indexes/ -I../../src/ee/GPUetc/storage/"
+    #INCLUDE = "-isystem ../../third_party/cpp/ -lm"
+    GPUARCHFLAGS = "-arch sm_%s "%ComCap
+    ALL_CCFLAGS = "-Xcompiler '-fPIC'"
+    ALL_LDFLAGS = "-Xcompiler '-fPIC' -Xlinker '--dynamic-linker=/lib/ld-linux-armhf.so.3'"
+    
+    os.system("mkdir -p %s"%(OUTPUT_PREFIX + "/objects/GPUetc/executors"))
+    os.system("mkdir -p %s"%(OUTPUT_PREFIX + "/objects/GPUetc/expressions"))
+    os.system("mkdir -p %s"%(OUTPUT_PREFIX + "/objects/GPUetc/indexes"))
+    os.system("mkdir -p %s"%(OUTPUT_PREFIX + "/objects/GPUetc/storage"))
+    
+    # End of adding
+
     # All permanent tests
     tests = []
     for dir in CTX.TESTS.keys():
@@ -517,6 +543,15 @@ def buildMakefile(CTX):
     makefile.write('#\n')
     makefile.write("THIRD_PARTY_SRC = $(ROOTDIR)/third_party/cpp\n")
     makefile.write("#\n")
+    
+    # Added for GPU
+    makefile.write("NVCC += %s\n"%(NVCC))
+    makefile.write("GPUFLAGS += %s\n"%(GPUFLAGS))
+    #makefile.write("INCLUDE += %s\n"%(INCLUDE))
+    makefile.write("GPUARCHFLAGS += %s\n"%(GPUARCHFLAGS))
+    makefile.write("ALL_CCFLAGS += %s\n"%(ALL_CCFLAGS))
+    makefile.write("ALL_LDFLAGS += %s\n"%(ALL_LDFLAGS))
+    # End of adding
 
     if CTX.TARGET == "CLEAN":
         makefile.write(".PHONY: clean\n")
@@ -538,7 +573,7 @@ def buildMakefile(CTX):
         makefile.write("main:\n")
     else:
         makefile.write("main: nativelibs/libvoltdb-%s.$(JNIEXT)\n" % version)
-
+        
     jni_objects = []
     static_objects = []
     for filename in input_paths:
@@ -559,9 +594,26 @@ def buildMakefile(CTX):
     makefile.write("\t$(NM) $(NMFLAGS) %s > $@\n" % jnilibname)
     makefile.write("\n")
 
+    # Added for GPU
+    jni_objects.append("objects/GPUetc/executors/gpuhj.co")
+    jni_objects.append("objects/GPUetc/executors/gpuij.co")
+    jni_objects.append("objects/GPUetc/executors/gpunij.co")
+    jni_objects.append("objects/GPUetc/executors/gprojection.co")
+    jni_objects.append("objects/GPUetc/executors/gseqscan.co")
+    jni_objects.append("objects/GPUetc/expressions/gexpression.co")
+    jni_objects.append("objects/GPUetc/indexes/HashIndex.co")
+    jni_objects.append("objects/GPUetc/indexes/TreeIndex.co")
+    jni_objects.append("objects/GPUetc/storage/gtuple.co")
+    jni_objects.append("objects/GPUetc/storage/gblock.co")
+    jni_objects.append("objects/GPUetc/storage/gtable.co")
+    
+    
+    # End of adding
+
     makefile.write("# main jnilib target\n")
     makefile.write("%s: %s\n" % (jnilibname, formatList(jni_objects)))
-    makefile.write("\t$(LINK.cpp) $(JNILIBFLAGS) -o $@ $^ $(LASTLDFLAGS) \n")
+    #makefile.write("\t$(LINK.cpp) $(JNILIBFLAGS) -o $@ $^ $(LASTLDFLAGS) \n")
+    makefile.write("\t$(LINK.cpp) $(JNILIBFLAGS) $(GPUFLAGS) -o $@ $^ $(LASTLDFLAGS) \n")
     makefile.write("\n")
     cleanobjs += [ jnilibname ]
 
@@ -591,6 +643,36 @@ def buildMakefile(CTX):
     # build the third party tools
     buildThirdPartyTools(CTX, makefile)
 
+    # Added for GPU
+    
+    makefile.write("objects/GPUetc/executors/gpuhj.co:../../src/ee/GPUetc/executors/gpuhj.cu \n")
+    makefile.write("\t$(NVCC) $(GPUFLAGS) $(GPUARCHFLAGS) $(ALL_CCFLAGS) -c $< -o $@ \n")
+    makefile.write("objects/GPUetc/executors/gpuij.co:../../src/ee/GPUetc/executors/gpuij.cu \n")
+    makefile.write("\t$(NVCC) $(GPUFLAGS) $(GPUARCHFLAGS) $(ALL_CCFLAGS) -c $< -o $@ \n")
+    makefile.write("objects/GPUetc/executors/gpunij.co:../../src/ee/GPUetc/executors/gpunij.cu \n")
+    makefile.write("\t$(NVCC) $(GPUFLAGS) $(GPUARCHFLAGS) $(ALL_CCFLAGS) -c $< -o $@ \n")
+    makefile.write("objects/GPUetc/executors/gprojection.co:../../src/ee/GPUetc/executors/projection.cu \n")
+    makefile.write("\t$(NVCC) $(GPUFLAGS) $(GPUARCHFLAGS) $(ALL_CCFLAGS) -c $< -o $@ \n")
+    makefile.write("objects/GPUetc/executors/gseqscan.co:../../src/ee/GPUetc/executors/seqscan.cu \n")
+    makefile.write("\t$(NVCC) $(GPUFLAGS) $(GPUARCHFLAGS) $(ALL_CCFLAGS) -c $< -o $@ \n")
+    
+    makefile.write("objects/GPUetc/expressions/gexpression.co:../../src/ee/GPUetc/expressions/gexpression.cu \n")
+    makefile.write("\t$(NVCC) $(GPUFLAGS) $(GPUARCHFLAGS) $(ALL_CCFLAGS) -c $< -o $@ \n")
+    
+    makefile.write("objects/GPUetc/indexes/GHashIndex.co:../../src/ee/GPUetc/indexes/HashIndex.cu \n")
+    makefile.write("\t$(NVCC) $(GPUFLAGS) $(GPUARCHFLAGS) $(ALL_CCFLAGS) -c $< -o $@ \n")
+    makefile.write("objects/indexes/GTreeIndex.co:../../src/ee/GPUetc/indexes/TreeIndex.cu \n")
+    makefile.write("\t$(NVCC) $(GPUFLAGS) $(GPUARCHFLAGS) $(ALL_CCFLAGS) -c $< -o $@ \n")
+    
+    makefile.write("objects/GPUetc/storage/gtuple.co:../../src/ee/GPUetc/storage/gtuple.cu \n")
+    makefile.write("\t$(NVCC) $(GPUFLAGS) $(GPUARCHFLAGS) $(ALL_CCFLAGS) -c $< -o $@ \n")
+    makefile.write("objects/GPUetc/storage/gblock.co:../../src/ee/GPUetc/storage/gblock.cu \n")
+    makefile.write("\t$(NVCC) $(GPUFLAGS) $(GPUARCHFLAGS) $(ALL_CCFLAGS) -c $< -o $@ \n")
+    makefile.write("objects/GPUetc/storage/gtable.co:../../src/ee/GPUetc/storage/gtable.cu \n")
+    makefile.write("\t$(NVCC) $(GPUFLAGS) $(GPUARCHFLAGS) $(ALL_CCFLAGS) -c $< -o $@ \n")
+    
+    # End of adding
+
     makefile.write("########################################################################\n")
     makefile.write("#\n# %s\n#\n" % "Volt Files")
     makefile.write("########################################################################\n")
@@ -605,9 +687,11 @@ def buildMakefile(CTX):
         makefile.write("#\n# %s\n#\n" % filename)
         makefile.write("########################################################################\n")
         makefile.write("%s: %s | build-third-party-tools \n" % (jni_objname, filename))
-        makefile.write("\t$(CCACHE) $(COMPILE.cpp) %s -MMD -MP -o $@ %s\n" % (CTX.EXTRAFLAGS, filename))
+        #makefile.write("\t$(CCACHE) $(COMPILE.cpp) %s -MMD -MP -o $@ %s\n" % (CTX.EXTRAFLAGS, filename))
+        makefile.write("\t$(CCACHE) $(COMPILE.cpp) $(GPUFLAGS) %s -MMD -MP -o $@ %s\n" % (CTX.EXTRAFLAGS, filename))
         makefile.write("%s: %s | build-third-party-tools \n" % (static_objname, filename))
-        makefile.write("\t$(CCACHE) $(COMPILE.cpp) %s -MMD -MP -o $@ %s\n" % (CTX.EXTRAFLAGS, filename))
+        #makefile.write("\t$(CCACHE) $(COMPILE.cpp) %s -MMD -MP -o $@ %s\n" % (CTX.EXTRAFLAGS, filename))
+        makefile.write("\t$(CCACHE) $(COMPILE.cpp) $(GPUFLAGS) %s -MMD -MP -o $@ %s\n" % (CTX.EXTRAFLAGS, filename))
         makefile.write("-include %s\n" % replaceSuffix(jni_objname, ".d"))
         makefile.write("-include %s\n" % replaceSuffix(static_objname, ".d"))
         cleanobjs += [jni_objname,
